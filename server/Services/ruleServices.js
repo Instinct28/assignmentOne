@@ -1,72 +1,139 @@
-const Node = require('../Node');
+const Node = require('./Node');
 
 const tokenize = (ruleString) => {
-    // This regular expression matches words, numbers, operators, and parentheses.
-    return ruleString.match(/[\w]+|[><=]+|[()]/g);
-}
+    if (typeof ruleString !== 'string' || ruleString.trim() === '') {
+        throw new Error('Invalid rule string: must be a non-empty string');
+    }
+    
+    // Regular expression to match words, numbers, operators, and parentheses
+    const tokens = ruleString.match(/[\w]+|[><=]+|[()]/g);
+    
+    if (!tokens || tokens.length === 0) {
+        throw new Error('Invalid rule string: failed to tokenize');
+    }
+    
+    return tokens;
+};
 
 const parseRuleStringToAST = (ruleString) => {
     const tokens = tokenize(ruleString);
     let index = 0;
+
     const parseExpression = () => {
-        let left = parseTerm();  // Parse the left operand
+        let left = parseTerm();
 
         while (index < tokens.length && (tokens[index] === 'AND' || tokens[index] === 'OR')) {
-            const operator = tokens[index];  // Get the operator (AND/OR)
-            index++;  // Move to the next token
-            const right = parseTerm();  // Parse the right operand
-            left = new Node('operator', operator, left, right);  // Create a new operator node with left and right children
+            const operator = tokens[index];
+            index++;
+            const right = parseTerm();
+            left = new Node('operator', operator, left, right);
         }
 
         return left;
     }
+
     const parseTerm = () => {
         if (tokens[index] === '(') {
-            index++;  // Skip '('
-            const expression = parseExpression();  // Recursively parse inside parentheses
-            index++;  // Skip ')'
+            index++;
+            const expression = parseExpression();
+            if (tokens[index] !== ')') {
+                throw new Error("Expected closing parenthesis");
+            }
+            index++;
             return expression;
         } else {
-            return parseCondition();  // Parse a condition (e.g., age > 30)
+            return parseCondition();
         }
     }
-    const parseCondition = () => {
-        const attribute = tokens[index++];  // Get the attribute (e.g., 'age')
-        const operator = tokens[index++];   // Get the comparison operator (e.g., '>')
-        const value = tokens[index++];      // Get the value (e.g., '30')
 
-        // Create an operand node for the condition
+    const parseCondition = () => {
+        if (index >= tokens.length) {
+            throw new Error("Unexpected end of input");
+        }
+
+        const attribute = tokens[index++];
+        const operator = tokens[index++];
+        const value = tokens[index++];
+
+        if (!attribute || !operator || !value) {
+            throw new Error("Invalid condition syntax");
+        }
+
         return new Node('operand', { attribute, operator, value });
     }
 
-    return parseExpression();  // Parse the entire rule string
-}
+    try {
+        const ast = parseExpression();
+        if (index < tokens.length) {
+            throw new Error("Unexpected tokens after valid expression");
+        }
+        return ast;
+    } catch (error) {
+        throw new Error(`Failed to parse rule string: ${error.message}`);
+    }
+};
+
+
+
+// const combineRules = (rules) => {
+//     if (!rules || rules.length === 0) {
+//         throw new Error('No rules provided');
+//     }
+
+//     // Parse each rule string into an AST
+//     const asts = rules.map(rule => parseRuleStringToAST(rule));
+
+//     // Combine ASTs using the most frequent operator heuristic
+//     const combinedAST = asts.reduce((combined, currentAST) => {
+//         if (!combined) {
+//             return currentAST;
+//         }
+
+//         // Combine the current AST with the combined AST using an OR operator (this is an example)
+//         return {
+//             type: 'operator',
+//             value: 'OR',
+//             left: combined,
+//             right: currentAST
+//         };
+//     }, null);
+
+//     return combinedAST;
+// }
 
 const combineRules = (rules) => {
+    // Validate the input, ensuring there are rules provided.
     if (!rules || rules.length === 0) {
         throw new Error('No rules provided');
     }
 
-    // Parse each rule string into an AST
-    const asts = rules.map(rule => parseRuleStringToAST(rule));
+    // Parse each rule string into an AST using the existing parsing logic
+    const asts = rules.map(rule => {
+        if (typeof rule !== 'string') {
+            throw new Error('Each rule must be a valid string');
+        }
+        return parseRuleStringToAST(rule);
+    });
 
-    // Combine ASTs using the most frequent operator heuristic
+    // Combine ASTs using the most frequent operator heuristic (OR in this case)
     const combinedAST = asts.reduce((combined, currentAST) => {
+        // If it's the first AST, we return it as the combined result
         if (!combined) {
             return currentAST;
         }
 
-        // Combine the current AST with the combined AST using an OR operator (this is an example)
+        // Combine the current AST with the combined AST using the OR operator
         return {
             type: 'operator',
-            value: 'OR',
+            value: 'OR', // Here, we are hardcoding the 'OR' operator for combining rules
             left: combined,
             right: currentAST
         };
     }, null);
 
+    // Return the final combined AST
     return combinedAST;
-}
+};
 
 function evaluateAST(node, data) {
     if (node.type === "operator") {

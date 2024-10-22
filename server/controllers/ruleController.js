@@ -2,7 +2,7 @@ const { parseRuleStringToAST, combineRules, evaluateAST } = require('../Services
 
 const createRule = (req, res) => {
     try {
-        const ruleString = req.body.rule;
+        const ruleString = req.body.ruleString;
         const ruleAST = parseRuleStringToAST(ruleString);
         res.json(ruleAST);
     } catch (error) {
