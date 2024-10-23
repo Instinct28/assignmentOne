@@ -16,4 +16,4 @@ COPY . .
 EXPOSE 5174
 
 # Start the application using serve
-CMD ["npm", "run", "dev"]
+CMD ["sh", "-c", "npm run dev"]
