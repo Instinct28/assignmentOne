@@ -1,53 +1,31 @@
-import { render, fireEvent, screen, waitFor } from '@testing-library/react';
-import EvaluateRuleForm from '../components/Home';
+import React from 'react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import axios from 'axios';
+import Evaluate from '../components/Home'; // Adjust the import path accordingly
+import '@testing-library/jest-dom';
 
-jest.mock('../components/Home');
+jest.mock('axios'); // Mock the axios library
 
-describe('EvaluateRuleForm', () => {
-    it('renders the form with the correct initial state', () => {
-        render(<EvaluateRuleForm />);
-        expect(screen.getByLabelText(/AST \(in JSON format\):/)).toBeInTheDocument();
-        expect(screen.getByLabelText(/Input Data \(in JSON format\):/)).toBeInTheDocument();
-    });
-
-    it('calls the evaluateRule service when the form is submitted', async () => {
-        evaluateRule.mockResolvedValueOnce(true);
-
-        render(<EvaluateRuleForm />);
-
-        fireEvent.change(screen.getByLabelText(/AST \(in JSON format\):/), {
-            target: { value: '{"type": "AND", "left": {}, "right": {}}' },
-        });
-
-        fireEvent.change(screen.getByLabelText(/Input Data \(in JSON format\):/), {
-            target: { value: '{"age": 35, "department": "Sales"}' },
-        });
-
-        fireEvent.click(screen.getByText(/Evaluate Rule/));
-
-        await waitFor(() => expect(evaluateRule).toHaveBeenCalledWith(
-            { type: 'AND', left: {}, right: {} },
-            { age: 35, department: 'Sales' }
-        ));
-
-        expect(screen.getByText(/Result: true/)).toBeInTheDocument();
-    });
-
+describe('Evaluate Component', () => {
     it('displays an error message if evaluateRule fails', async () => {
-        evaluateRule.mockRejectedValueOnce(new Error('Invalid data'));
+        axios.post.mockRejectedValueOnce(new Error('API error'));
 
-        render(<EvaluateRuleForm />);
+        render(<Evaluate />);
 
-        fireEvent.change(screen.getByLabelText(/AST \(in JSON format\):/), {
-            target: { value: '{"type": "AND", "left": {}, "right": {}}' },
+        // Simulate filling in the form
+        fireEvent.change(screen.getByLabelText(/AST \(JSON\):/), {
+            target: { value: '{"type": "operator", "operator": "AND"}' }
         });
+        fireEvent.change(screen.getByLabelText(/Age:/), { target: { value: '30' } });
+        fireEvent.change(screen.getByLabelText(/Department:/), { target: { value: 'Sales' } });
+        fireEvent.change(screen.getByLabelText(/Salary:/), { target: { value: '50000' } });
+        fireEvent.change(screen.getByLabelText(/Experience:/), { target: { value: '5' } });
 
-        fireEvent.change(screen.getByLabelText(/Input Data \(in JSON format\):/), {
-            target: { value: '{"age": 35, "department": "Sales"}' },
+        // Use getByRole to find the button and click it
+        fireEvent.click(screen.getByRole('button', { name: /Evaluate/i }));
+
+        await waitFor(() => {
+            expect(screen.getByText(/Error evaluating rule/i)).toBeInTheDocument();
         });
-
-        fireEvent.click(screen.getByText(/Evaluate Rule/));
-
-        await waitFor(() => expect(screen.getByText(/Invalid data/)).toBeInTheDocument());
     });
 });

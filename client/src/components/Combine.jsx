@@ -30,46 +30,48 @@ const Combine = () => {
 
     return (
       <div className="container">
-      <h2>Combine Two Rules and Display Combined AST</h2>
-      <form onSubmit={handleSubmit}>
-          <div>
-              <label>Rule 1:</label>
-              <textarea
-                  rows="4"
-                  value={rule1}
-                  onChange={handleChangeRule1}
-                  placeholder="Enter first rule"
-                  required
-              />
-          </div>
-          <div>
-              <label>Rule 2:</label>
-              <textarea
-                  rows="4"
-                  value={rule2}
-                  onChange={handleChangeRule2}
-                  placeholder="Enter second rule"
-                  required
-              />
-          </div>
-          <button type="submit">Combine Rules</button>
-      </form>
+          <h2>Combine Two Rules and Display Combined AST</h2>
+          <form onSubmit={handleSubmit}>
+              <div>
+                  <label htmlFor="rule1">Rule 1:</label>
+                  <textarea
+                      id="rule1" // Added id
+                      rows="4"
+                      value={rule1}
+                      onChange={handleChangeRule1}
+                      placeholder="Enter first rule"
+                      required
+                  />
+              </div>
+              <div>
+                  <label htmlFor="rule2">Rule 2:</label>
+                  <textarea
+                      id="rule2" // Added id
+                      rows="4"
+                      value={rule2}
+                      onChange={handleChangeRule2}
+                      placeholder="Enter second rule"
+                      required
+                  />
+              </div>
+              <button type="submit">Combine Rules</button>
+          </form>
 
-      {/* Display Combined AST */}
-      {combinedAst && (
-          <div className="ast-output">
-              <h3>Combined AST:</h3>
-              <pre>{JSON.stringify(combinedAst, null, 2)}</pre>
-          </div>
-      )}
+          {/* Display Combined AST */}
+          {combinedAst && (
+              <div className="ast-output">
+                  <h3>Combined AST:</h3>
+                  <pre>{JSON.stringify(combinedAst, null, 2)}</pre>
+              </div>
+          )}
 
-      {/* Display Error */}
-      {error && (
-          <div className="error">
-              <p>{error}</p>
-          </div>
-      )}
-  </div>
+          {/* Display Error */}
+          {error && (
+              <div className="error">
+                  <p>{error}</p>
+              </div>
+          )}
+      </div>
     );
 };
 

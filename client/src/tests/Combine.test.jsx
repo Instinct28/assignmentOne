@@ -1,36 +1,50 @@
-import { render, fireEvent, screen, waitFor } from '@testing-library/react';
-import CombineRulesForm from '../components/Combine';
+import React from 'react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import axios from 'axios';
+import Combine from '../components/Combine'; // Adjust the import path accordingly
 
-jest.mock('../components/Combine');
+import '@testing-library/jest-dom';
 
-describe('CombineRulesForm', () => {
-    it('renders the form with the correct initial state', () => {
-        render(<CombineRulesForm />);
-        expect(screen.getByLabelText(/Rule 1:/)).toBeInTheDocument();
-        expect(screen.getByLabelText(/Rule 2:/)).toBeInTheDocument();
+jest.mock('axios'); // Mock the axios library
+
+describe('Combine Component', () => {
+    it('calls the combineRule service when the form is submitted', async () => {
+        const mockCombinedAst = { type: 'AND', left: {}, right: {} };
+        axios.post.mockResolvedValueOnce({ data: mockCombinedAst });
+
+        render(<Combine />);
+
+        fireEvent.change(screen.getByLabelText(/Rule 1:/), { target: { value: 'rule1' } });
+        fireEvent.change(screen.getByLabelText(/Rule 2:/), { target: { value: 'rule2' } });
+
+        fireEvent.click(screen.getByText(/Combine Rules/i));
+
+        await waitFor(() => {
+            expect(axios.post).toHaveBeenCalledWith('http://localhost:8000/api/combineRule', {
+                rules: ['rule1', 'rule2'],
+            });
+        });
+
+        expect(screen.getByText(/Combined AST:/i)).toBeInTheDocument();
+
+        // Use regex to match the combined AST text
+        expect(screen.getByText(/"type":\s*"AND"/)).toBeInTheDocument();
+        expect(screen.getByText(/"left":\s*{}/)).toBeInTheDocument();
+        expect(screen.getByText(/"right":\s*{}/)).toBeInTheDocument();
     });
 
-    it('calls the combineRules service when the form is submitted', async () => {
-        const mockAst = { type: 'AND', left: {}, right: {} };
-        combineRules.mockResolvedValueOnce(mockAst);
+    it('displays an error message if the API call fails', async () => {
+        axios.post.mockRejectedValueOnce(new Error('API error'));
 
-        render(<CombineRulesForm />);
+        render(<Combine />);
 
-        fireEvent.change(screen.getByLabelText(/Rule 1:/), {
-            target: { value: "age > 30 AND department = 'Sales'" },
+        fireEvent.change(screen.getByLabelText(/Rule 1:/), { target: { value: 'rule1' } });
+        fireEvent.change(screen.getByLabelText(/Rule 2:/), { target: { value: 'rule2' } });
+
+        fireEvent.click(screen.getByText(/Combine Rules/i));
+
+        await waitFor(() => {
+            expect(screen.getByText(/Error combining rules/i)).toBeInTheDocument();
         });
-
-        fireEvent.change(screen.getByLabelText(/Rule 2:/), {
-            target: { value: "salary > 50000 OR experience > 5" },
-        });
-
-        fireEvent.click(screen.getByText(/Combine Rules/));
-
-        await waitFor(() => expect(combineRules).toHaveBeenCalledWith([
-            "age > 30 AND department = 'Sales'",
-            "salary > 50000 OR experience > 5"
-        ]));
-
-        expect(screen.getByText(/Combined AST:/)).toBeInTheDocument();
     });
 });

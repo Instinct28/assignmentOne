@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const Home = () => {
-    let [ast, setAst] = useState(''); // Store the AST as a string
+    const [ast, setAst] = useState(''); // Store the AST as a string
     const [data, setData] = useState({
         age: '',
         department: '',
@@ -27,11 +27,11 @@ const Home = () => {
 
         try {
             // Parse the AST string into a JSON object
-            ast = JSON.parse(ast);
-            const result = await axios.post('http://localhost:8000/api/evaluateRule', { ast, data });
+            const parsedAst = JSON.parse(ast);
+            const result = await axios.post('http://localhost:8000/api/evaluateRule', { ast: parsedAst, data });
             setEvaluationResult(result.data);
             setAst('');
-            setData({age: '', department: '', salary: '', experience: ''});
+            setData({ age: '', department: '', salary: '', experience: '' });
         } catch (err) {
             setError('Error evaluating rule');
         }
@@ -42,8 +42,9 @@ const Home = () => {
             <h2>Evaluate Rule Against Data</h2>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label>AST (JSON):</label>
+                    <label htmlFor="ast">AST (JSON):</label>
                     <textarea
+                        id="ast" // Add an id here
                         rows="5"
                         value={ast}
                         onChange={handleAstChange}
@@ -52,8 +53,9 @@ const Home = () => {
                     />
                 </div>
                 <div>
-                    <label>Age:</label>
+                    <label htmlFor="age">Age:</label> {/* Added htmlFor */}
                     <input
+                        id="age" // Add an id here
                         type="number"
                         name="age"
                         value={data.age}
@@ -62,8 +64,9 @@ const Home = () => {
                     />
                 </div>
                 <div>
-                    <label>Department:</label>
+                    <label htmlFor="department">Department:</label> {/* Added htmlFor */}
                     <input
+                        id="department" // Add an id here
                         type="text"
                         name="department"
                         value={data.department}
@@ -72,8 +75,9 @@ const Home = () => {
                     />
                 </div>
                 <div>
-                    <label>Salary:</label>
+                    <label htmlFor="salary">Salary:</label> {/* Added htmlFor */}
                     <input
+                        id="salary" // Add an id here
                         type="number"
                         name="salary"
                         value={data.salary}
@@ -82,8 +86,9 @@ const Home = () => {
                     />
                 </div>
                 <div>
-                    <label>Experience:</label>
+                    <label htmlFor="experience">Experience:</label> {/* Added htmlFor */}
                     <input
+                        id="experience" // Add an id here
                         type="number"
                         name="experience"
                         value={data.experience}

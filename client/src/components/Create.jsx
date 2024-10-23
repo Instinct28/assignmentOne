@@ -24,12 +24,13 @@ const Create = () => {
     };
 
     return (
-      <div className="container">
+        <div className="container">
             <h2>Create Rule and Display AST</h2>
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label>Rule String:</label>
+                    <label htmlFor="ruleString">Rule String:</label>
                     <textarea
+                        id="ruleString"
                         rows="4"
                         value={ruleString}
                         onChange={handleChange}
