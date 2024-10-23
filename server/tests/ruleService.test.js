@@ -10,7 +10,7 @@ describe('Rule Engine Services', () => {
             // Define the expected AST structure
             const expectedAST = new Node('operator', 'AND', 
                 new Node('operand', { attribute: 'age', operator: '>', value: '30' }),
-                new Node('operand', { attribute: 'department', operator: '=', value: "'Sales'" })
+                new Node('operand', { attribute: 'department', operator: '=', value: 'Sales' }) // Removed extra quotes
             );
     
             // Call the parse function
