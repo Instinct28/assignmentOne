@@ -15,7 +15,7 @@ const Create = () => {
         setError(null);
 
         try {
-            const generatedAst = await axios.post('http://localhost:8000/api/createRules', { ruleString });
+            const generatedAst = await axios.post('http://localhost:8001/api/createRules', { ruleString });
             console.log(generatedAst.data);
             setAst(generatedAst.data);
         } catch (err) {

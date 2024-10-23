@@ -21,7 +21,7 @@ const Combine = () => {
 
         try {
             const rules = [rule1, rule2];
-            const generatedAst = await axios.post('http://localhost:8000/api/combineRule', { rules });
+            const generatedAst = await axios.post('http://localhost:8001/api/combineRule', { rules });
             setCombinedAst(generatedAst.data);
         } catch (err) {
             setError('Error combining rules');

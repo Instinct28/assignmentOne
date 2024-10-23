@@ -28,7 +28,7 @@ const Home = () => {
         try {
             // Parse the AST string into a JSON object
             const parsedAst = JSON.parse(ast);
-            const result = await axios.post('http://localhost:8000/api/evaluateRule', { ast: parsedAst, data });
+            const result = await axios.post('http://localhost:8001/api/evaluateRule', { ast: parsedAst, data });
             setEvaluationResult(result.data);
             setAst('');
             setData({ age: '', department: '', salary: '', experience: '' });

@@ -1,0 +1,15 @@
+version: '3'
+services:
+  backend:
+    build:
+      context: ./server  # Adjust the path if necessary
+    ports:
+      - "8001:8001"  # Host:Container port mapping
+
+  frontend:
+    build:
+      context: ./client  # Adjust the path if necessary
+    ports:
+      - "5174:5174"  # Host:Container port mapping
+    depends_on:
+      - backend

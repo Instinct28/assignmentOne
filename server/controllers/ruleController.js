@@ -1,6 +1,6 @@
 const { parseRuleStringToAST, combineRules, evaluateAST } = require('../Services/ruleServices');
 
-const createRule = (req, res) => {
+const createRule = async (req, res) => {
     try {
         const ruleString = req.body.ruleString;
         const ruleAST = parseRuleStringToAST(ruleString);
