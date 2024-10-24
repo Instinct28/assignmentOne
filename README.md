@@ -27,6 +27,15 @@ A web application for combining and evaluating rules using Abstract Syntax Trees
 - **Testing**: Jest, React Testing Library
 - **Styling**: CSS (or any CSS framework you might be using)
 
+## Getting Started
+
+### Prerequisites
+
+Make sure you have the following installed on your machine:
+
+- [Docker](https://www.docker.com/get-started) 
+- A Docker Hub account (optional for pushing images)
+
 ### Clone the Repository
 
 Clone the repository to your local machine:
