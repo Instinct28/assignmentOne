@@ -59,6 +59,7 @@ npm run dev
 ```
 
 ### Running with Docker
+-[Docker repository Link] (instinctyash/assignmentone general | Docker Hub)
 ```bash
-docker pull instinctyash/frontend:
+docker pull instinctyash/assignmentone
 ```
